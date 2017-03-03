@@ -13,7 +13,9 @@
 # you can find in the ~MPP_EUNAM/software a tar.gz version of the package
 # mppRDraft build for this research
 
-library(mppRDraft)
+# library(mppRDraft)
+
+library(mppR)
 
 library(qtl)
 library(asreml)
@@ -751,17 +753,20 @@ setwd(path)
 
 # Genotype
 
-geno <- read.csv("./data/geno/geno_panzea_full.csv")
-rownames(geno) <- geno[,1]
-geno <- geno[,-1]
+geno <- read.csv("./data/geno/geno_panzea_full.csv", row.names = 1)
 
 # phenotypic data
 
-pheno <- read.csv("./data/pheno/Adj_means.csv")
-rownames(pheno) <- as.character(pheno[,1])
-pheno <- pheno[,-1]
+pheno <- read.csv("./data/pheno/Adj_means.csv", row.names = 1)
 
-cross.ind <- substr(rownames(pheno),1,5)
+cross.ind <- substr(rownames(pheno), 1, 5)
+
+# map
+
+map <- read.table("./data/map/map_panzea_full.txt", h = T)
+mk.names <- as.character(map[, 1])
+mk.names <- gsub("-", ".", mk.names)
+map[, 1] <- mk.names
 
 # cross partition
 
@@ -770,10 +775,10 @@ cross.partition <- read.table("./data/geno/cross.partition.txt")
 
 # index for selection with parent and genotype belonging to the selected cross
 
-index.sel <- c(rownames(geno)[1:11] %in% c("F353",as.character(cross.partition[,4])),
-               cross.ind %in% cross.partition[,1])
+index.sel <- c(rownames(geno)[1:11] %in% c("F353", as.character(cross.partition[, 4])),
+               cross.ind %in% cross.partition[, 1])
 
-geno.short <- geno[index.sel,]
+geno.short <- geno[index.sel, ]
 
 # 5.1 subset line to equalize with long subset
 ##########################################
@@ -781,9 +786,90 @@ geno.short <- geno[index.sel,]
 # take 361 lines to have same population size with
 # the long subset
 
-sel.ind <- sort(sample(7:486,361))
+sel.ind <- sort(sample(7:486, 361))
 
-geno.short <- rbind(geno.short[1:6,], geno.short[sel.ind,])
+geno.short <- rbind(geno.short[1:6, ], geno.short[sel.ind, ])
+
+
+###################### use directly the QC_proc function #######################
+
+geno <- geno.short
+
+# geno
+
+geno <- as.matrix(geno)
+geno[geno == "A"] <- "AA"
+geno[geno == "B"] <- "BB"
+geno[geno == "-"] <- NA
+
+geno.off <- geno[7:367, ]
+geno.par <- geno[1:6, ]
+
+# map
+
+map <- map
+
+# pheno
+
+trait <- pheno[rownames(pheno) %in% rownames(geno), 1, drop = FALSE]
+trait <- data.frame(rownames(trait), trait[, 1], stringsAsFactors = FALSE)
+
+cross.ind <- substr(trait[, 1], 1, 5)
+
+par.per.cross <- cbind(cross.partition[, 1, drop = FALSE], rep("F353", 5),
+                       cross.partition[, 4, drop = FALSE])
+
+par.per.cross <- as.matrix(par.per.cross)
+par.per.cross <- par.per.cross[c(5, 3, 2, 4, 1), ]
+
+colnames(par.per.cross) <- c("cr", "par1", "par2")
+
+# two different vectors for the MAF.cr.lim
+
+# 1. deviation from HWE from chi-square test
+
+MAF.lim <- function(x, pval = 0.05){
+  
+  quantile <- qchisq(p = pval, df = 1, lower.tail = FALSE)
+  
+  y <- seq(0, .5, 0.001)
+  val <- (1-(2*y))^2
+  crit.p <- y[val > (quantile/(2*x))]
+  
+  crit.p[length(crit.p)]
+  
+}
+
+n.cr <- table(cross.ind)
+
+wth.cr.MAF1 <- unlist(lapply(X = n.cr, FUN = MAF.lim, pval = 0.01))
+
+
+# 2. standard procedure
+
+MAF.lim <- function(floor, n.cr){
+  
+  (5/n.cr) + floor
+  
+}
+
+wth.cr.MAF2 <- MAF.lim(floor = 0.05, n.cr = n.cr)
+
+data_QC1 <- QC_proc(geno.off = geno.off, geno.par = geno.par, map = map,
+                   trait = trait, cross.ind = cross.ind,
+                   par.per.cross = par.per.cross, MAF.cr.lim = wth.cr.MAF1,
+                   MAF.cr.miss = FALSE, ABH = TRUE)
+
+dim(data_QC1$geno.off)
+
+data_QC2 <- QC_proc(geno.off = geno.off, geno.par = geno.par, map = map,
+                    trait = trait, cross.ind = cross.ind,
+                    par.per.cross = par.per.cross, MAF.cr.lim = wth.cr.MAF2,
+                    MAF.cr.miss = FALSE, ABH = TRUE)
+
+dim(data_QC2$geno.off)
+
+###################### stop directly the QC_proc function ######################
 
 
 # 5.2 Remove monomorphic and missing value positions
@@ -937,7 +1023,7 @@ setwd(path)
 # genotypes
 
 geno.off <- read.csv("./data/geno/geno.short.off.sg.pos.csv",
-                     stringsAsFactors = FALSE,row.names = 1,)
+                     stringsAsFactors = FALSE,row.names = 1)
 geno.off <- as.matrix(geno.off)
 
 
@@ -1033,6 +1119,73 @@ saveRDS(data.short.ABH,file="./data/mpp_data/data.short.ABH.rds")
 
 # 5.5.2 mpp.data (biallelic)
 ##########################
+
+###################### imputation with Beagle
+
+library(synbreed)
+
+### form a gpData object
+
+# geno
+
+geno.biall <- as.matrix(geno.biall)
+geno.biall[geno.biall == "A"] <- "AA"
+geno.biall[geno.biall == "B"] <- "BB"
+geno.biall[geno.biall == "-"] <- NA
+
+# pheno
+
+trait <- pheno[, 1, drop = FALSE]
+
+# map
+
+map[, 1] <- as.character(map[, 1])
+rownames(map) <- map[, 1]
+map2 <- map[, 2:3]
+colnames(map2) <- c("chr", "pos")
+
+# family
+
+family <- data.frame(cross.ind)
+rownames(family) <- rownames(geno.biall)
+
+gp <- create.gpData(pheno = trait, geno = geno.biall, map = map2,
+                    family = family, map.unit = "Mb")
+
+### impute
+
+gp.imp <- codeGeno(gpData = gp, impute = TRUE, impute.type = "family",
+                   maf = .01, nmiss = .2, label.heter = NULL)
+
+geno.biall2 <- gp.imp$geno
+
+
+######################## end imputation with Beagle
+
+#################### produce the mppData object
+
+trait <- data.frame(rownames(pheno), pheno[, 1], stringsAsFactors = FALSE)
+
+# with ATCG data
+
+data.short.biall <- mppData_form(geno.off = geno.biall, geno.par = geno.par,
+                                 IBS = TRUE, type = "dh", map = map,
+                                 trait = trait, cross.ind = cross.ind,
+                                 par.per.cross = par.per.cross)
+
+# with 012 data
+
+data.short.biall2 <- mppData_form(geno.off = geno.biall2, geno.par = geno.par,
+                                 IBS = TRUE, IBS.format = "012", type = "dh",
+                                 map = map, trait = trait, cross.ind = cross.ind,
+                                 par.per.cross = par.per.cross)
+# test
+
+test_mpp <- mpp_proc(mppData = data.short.biall2, Q.eff = "biall", thre.cof = 4,
+                     thre.QTL = 4, output.loc = "E:/PhD/Test")
+
+########################## end produce mppData object
+
 
 data.short.biall <- mpp.data(geno = geno.biall,geno.par = geno.par,biall = TRUE,
                              type = "dh",map = map,trait = trait.DMY,
