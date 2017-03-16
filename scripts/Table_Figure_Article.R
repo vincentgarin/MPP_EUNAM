@@ -5,22 +5,21 @@
 # Table 1
 #########
 
-library(mppRDraft)
+library(mppR)
 library(xtable)
 
-path <- "~/MPP_EUNAM"
+path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
 
 setwd(path)
 
 # Genotype
 
 geno.par <- read.csv("./data/geno/geno_panzea_par.csv", row.names = 1)
-
+geno.par <- as.matrix(geno.par)
 
 # SM coefficient distance between the central parent (F353)
 
-kin.mat.par <- kinship.matrix(mk.mat = geno.par, method = "SM")
-
+kin.mat.par <- SM_comp(mk.mat = geno.par)
 
 dist.cent.par <- kin.mat.par[, 6]
 dist.cent.par <- dist.cent.par[ -6]
@@ -31,15 +30,17 @@ dist.cent.par <- dist.cent.par[ -6]
 crosses <- c("CFD02","CFD03","CFD04","CFD05","CFD06","CFD07",
              "CFD09","CFD10","CFD11","CFD12")
 
+parent2 <- c("B73","D06","D09","EC169","F252","F618","Mo17",
+             "UH250","UH304","W117")
+
 # sample sizes
 
-pheno.short <- read.csv("./data/pheno/pheno.short.sorted.csv", row.names = 1)
-pheno.hetero <- read.csv("./data/pheno/pheno.hetero.sorted.csv", row.names = 1)
-pheno.long <- read.csv("./data/pheno/pheno.long.sorted.csv", row.names = 1)
+geno_used <- read.table("./data/geno/geno_sel_list.txt")
 
-short.cr <- substr(rownames(pheno.short), 1, 5)
-hetero.cr <- substr(rownames(pheno.hetero), 1, 5)
-long.cr <- substr(rownames(pheno.long), 1, 5)
+
+short.cr <- substr(geno_used[, 1], 1, 5)
+hetero.cr <- substr(geno_used[, 2], 1, 5)
+long.cr <- substr(geno_used[, 3], 1, 5)
 
 short.cr.sz <- table(short.cr)
 hetero.cr.sz <- table(hetero.cr)
@@ -57,8 +58,9 @@ N.lg[crosses %in% names(long.cr.sz)] <- long.cr.sz
 library(asreml)
 
 pheno <- read.csv("./data/pheno/pheno_red.csv", row.names = 1)
-
 lines_used <- read.csv("./data/pheno/List_lines_Dent_Lehermeier.csv")
+adj_means <- read.csv("./data/pheno/Adj_means.csv", row.names = 1)
+cross.ind <- substr(rownames(adj_means), 1, 5)
 
 # suppress the factor levels with 0 occurences
 
@@ -69,79 +71,68 @@ pheno$Fam <- as.factor(as.character(pheno$Fam))
 
 pheno <- pheno[order(pheno$Fam), ]
 
-par_names <- c("B73","D06", "D09", "EC169", "F252", "F353", "F618", "F98902",
-               "Mo17", "UH250", "UH304","W117")
 
-# DMY
+trait.id <- c("DMY", "PH")
+trait.stats <- c()
 
-model <- asreml(fixed = DMY~1, random= ~ Fam + at(Fam):Genotype + 
+
+for (i in 1:2){
+  
+  trait.av <- tapply(X = adj_means[, trait.id[i]], INDEX = as.factor(cross.ind),
+                     FUN = function(x) mean(x, na.rm = TRUE))
+  
+  trait.av <- round(trait.av[-11], 1)
+  
+  fix_formula <- paste(trait.id[i], " ~ 1", sep = "")
+  
+  model <- asreml(fixed = as.formula(fix_formula),
+                  random = ~ Fam + at(Fam):Genotype + 
                   at(Fam):LOC:Genotype + LOC:Rep + LOC:Rep:Block,
-                rcov=~at(Fam):units, data = pheno,
-                na.method.X = "omit", na.method.Y="omit")
+                  rcov=~at(Fam):units, data = pheno,
+                  na.method.X = "omit", na.method.Y = "omit")
+  
+  var.comp <- summary(model)$varcomp
+  var.comp <-round(cbind(var.comp[c(3:12), 2], var.comp[c(14:23), 2],
+                         var.comp[c(27:36), 2]), 2)
+  
+  her <- round(100*(var.comp[, 1]/(var.comp[, 1] + (var.comp[, 2]/4) +
+                                     (var.comp[, 3]/5))), 1)
+  
+  trait.stats <- cbind(trait.stats, cbind(trait.av, var.comp[, 1], her))
+  
+} 
+
+blank <- rep("", 10)
+
+subset.part <- data.frame(crosses, parent2, dist.cent.par, trait.stats[, 1:3],
+                          blank, trait.stats[, 4:6], N.sh, N.het, N.lg)
+
+subset.part <- subset.part[order(subset.part[, 3], decreasing = TRUE), ]
 
 
-var.DMY <- summary(model)$varcomp
-gen.var.DMY <- var.DMY[c(2:11), 1]
-
-colnames(var.DMY) <- c("sigma.g", "std.err", "sigma.ge", "std.err",
-                       "heritability")
-
-
-# PH
-
-model <- asreml(fixed = PH~1, random = ~ Fam + at(Fam):Genotype + 
-                  at(Fam):LOC:Genotype + LOC:Rep + LOC:Rep:Block,
-                rcov=~at(Fam):units, data = pheno,
-                na.method.X = "omit", na.method.Y = "omit")
-
-var.PH <- summary(model)$varcomp
-gen.var.PH <- var.PH[c(2:11), 1]
-
-
-# parent per cross
-
-parent1 <- as.character(rep("F353",10))
-parent2 <- c("B73","D06","D09","EC169","F252","F618","Mo17",
-             "UH250","UH304","W117")
-par.per.cross <- cbind(crosses, parent1, parent2)
-
-dist.cent.par <- data.frame(par.per.cross[,1], par.per.cross[,3],
-                            round(dist.cent.par, 3), gen.var.DMY, gen.var.PH,
-                            N.sh, N.het, N.lg)
-
-colnames(dist.cent.par) <- c("cross","parent 2","SM", "var.g.DMY", "var.g.PH",
-                             "short","het.","long")
-dist.cent.par
-
-# order the crosses according to genetic distance between parents
-
-subset.part <- dist.cent.par[order(dist.cent.par$SM, decreasing = T), ]
-
-# colnames(subset.part) <- c("Cross","Parent","$\\SM^{a}$","$\\sigma_{g}^{2}$ (DMY)",
-#                            "$\\sigma_{g}^{2}$ (PH)", "short", "het.", "long")
-
-colnames(subset.part) <- c("Cross","Parent","SM","var.g.DMY", "var.g.PH",
-                           "short", "het.", "long")
+colnames(subset.part) <- c("Cross","Parent","SM","X.DMY", "var.g.DMY",
+                           "her.DMY", "", "X.PH", "var.g.PH", "her.PH" ,"short",
+                           "het.", "long")
 
 
 # export to Latex
 
-map.sum.short.Ltx <- print(xtable(subset.part,
-                                  align = c("l","l","l","c","c","c","c","c","c")),
-                           include.rownames = FALSE)
 
 folder <- "E:/PhD/Manuscript/1st_chapter/Latex/table/"
 file <- paste0(folder,"subset_partition.txt")
 
-write(x = print(xtable(subset.part,digits = c(0,0,0,3,2,2,0,0,0),
+write(x = print(xtable(subset.part,digits = c(0,0,0,3,1,1,1,0,1,1,1,0,0,0),
                        caption = "Subsets of the population",
-                       align = c("l","l","l", "c", "c","c","c","c","c")),
+                       align = c("l","l","l","c","c","c","c","c","c","c","c","c",
+                                 "c","c")),
                 table.placement = NULL,
                 include.rownames=FALSE, caption.placement = "top"), file=file)
 
 ################################################################################
 ############################# End Table 1 ######################################
 ################################################################################
+
+############# stop there
 
 # Figure 3
 ##########

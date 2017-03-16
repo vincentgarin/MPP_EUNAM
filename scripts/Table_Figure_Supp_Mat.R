@@ -6,29 +6,26 @@
 ######################
 
 
-library(mppRDraft)
+library(mppR)
 library(xtable)
 
-path <- "~/MPP_EUNAM/"
+path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
 
 setwd(path)
 
 # Genotype
 
-geno.par <- read.csv("./data/geno/geno_panzea_par.csv")
-rownames(geno.par) <- geno.par[,1]
-geno.par <- geno.par[,-1]
+geno.par <- read.csv("./data/geno/geno_panzea_par.csv", row.names = 1)
+geno.par <- as.matrix(geno.par)
 
-# SM coefficient distance between the central parent (F353)
+# SM coefficient distance between parents
 
-kin.mat.par <- kinship.matrix(mk.mat = geno.par, method = "SM")
+kin.mat.par <- SM_comp(mk.mat = geno.par)
 
-kin.mat.par <- round(kin.mat.par,3)
+kin.mat.par <- round(kin.mat.par, 3)
 kin.mat.par2 <- kin.mat.par
 
 kin.mat.par2[lower.tri(kin.mat.par2)] <- ""
-
-kin.mat.par2
 
 folder <- "E:/PhD/Manuscript/1st_chapter/Latex/table/"
 
@@ -45,8 +42,119 @@ write(x = print(xtable(kin.mat.par2,digits = c(0,3,3,3,3,3,3,3,3,3,3,3),
                 include.rownames=TRUE),
       file=paste(folder,"SM_table.txt",sep = ""))
 
+par.short <- c("UH304", "F252", "D09", "F618", "D06")
+par.hetero <- c("UH304", "D09", "D06", "W117", "B73")
+par.long <-  c("UH250", "Mo17",  "W117", "EC169", "B73")
+
+kin.mat.short <- kin.mat.par[rownames(kin.mat.par) %in%
+                               c("F353",as.character(par.short)), ]
+kin.mat.short <- kin.mat.short[, colnames(kin.mat.short) %in%
+                                 c("F353",as.character(par.short))]
+
+kin.mat.hetero <- kin.mat.par[rownames(kin.mat.par) %in%
+                                c("F353",as.character(par.hetero)), ]
+kin.mat.hetero <- kin.mat.hetero[, colnames(kin.mat.hetero) %in%
+                                   c("F353",as.character(par.hetero))]
+
+kin.mat.long <- kin.mat.par[rownames(kin.mat.par) %in%
+                              c("F353",as.character(par.long)), ]
+kin.mat.long <- kin.mat.long[, colnames(kin.mat.long) %in%
+                               c("F353",as.character(par.long))]
+
+mean(kin.mat.short[lower.tri(kin.mat.short)])
+mean(kin.mat.hetero[lower.tri(kin.mat.hetero)])
+mean(kin.mat.long[lower.tri(kin.mat.long)])
+
 ################################################################################
 ######################### End Kinship matrix GS ################################
+################################################################################
+
+# S3 PC biplot of the EU-NAM Dent parents
+#########################################
+
+path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+
+setwd(path)
+
+# Genotype
+
+geno.par <- read.csv("./data/geno/geno_panzea_par.csv", row.names = 1)
+geno.par <- as.matrix(geno.par)
+
+mk.mat <-  geno.par
+cross.ind <- rownames(geno.par)
+
+col.vect <- c("red", "blue", "green", "cyan", "magenta", "black", "grey",
+              "black", "brown", "orange", "violet")
+
+shape.vect <- c(3, 3, 3, 3, 3, 15, 3, 3, 3, 3, 3)
+
+# remove monomorphic or missing columns
+
+MAF <- QC_MAF(mk.mat = mk.mat)
+index <- which((MAF == 0)| is.na(MAF))
+mk.mat <- mk.mat[, -index]
+
+# impute to have complete data
+
+Sample  <-  function(x, ...) if (length(x) == 1) { x
+} else {sample(x, replace = TRUE, ...)}
+count  <-  function(v) sum(v)
+impute  <-  function(d) {
+  r  <-  apply(d, 2, function(col) {
+    col0  <-  col
+    col[is.na(col)] = Sample(na.omit(col), count(is.na(col)))
+    col
+  })
+  r
+}
+
+mk.mat <- impute(mk.mat)
+
+mk.mat <- geno_012(mk.mat)[[1]]
+
+# compute PCs
+
+res <- prcomp(mk.mat, center = TRUE, scale. = TRUE)
+
+var.PC <- round((res$sdev[1:2]^2)/sum(res$sdev^2)*100, 2)
+
+# Plot PCs
+
+par(mar=c(5.1, 4.1, 4.1, 8.1), xpd = TRUE)
+
+plot(res$x[,1], res$x[,2], col = col.vect, main = "EU-NAM Dent parents",
+     xlab = paste("PC1", paste("(", var.PC[1], "%", ")", sep = "")),
+     ylab = paste("PC2", paste("(",var.PC[2], "%",")", sep = "")),
+     pch = shape.vect)
+
+# Add legend to top right, outside plot region
+legend("topright", inset = c(-0.2, 0), legend = levels(as.factor(cross.ind)),
+       title = "Parents", pch = shape.vect, col = col.vect)
+
+
+# save the plot
+
+setwd("E:/PhD/Manuscript/1st_chapter/Latex/figures")
+
+jpeg(filename = "Parents_PC_biplot.jpg", width = 758, height = 585,
+     quality = 100, res = 100)
+
+par(mar=c(5.1, 4.1, 4.1, 8.1), xpd = TRUE)
+
+plot(res$x[,1], res$x[,2], col = col.vect, main = "EU-NAM Dent parents",
+     xlab = paste("PC1", paste("(", var.PC[1], "%", ")", sep = "")),
+     ylab = paste("PC2", paste("(",var.PC[2], "%",")", sep = "")),
+     pch = shape.vect)
+
+# Add legend to top right, outside plot region
+legend("topright", inset = c(-0.2, 0), legend = levels(as.factor(cross.ind)),
+       title = "Parents", pch = shape.vect, col = col.vect)
+
+dev.off()
+
+################################################################################
+############################## End PC biplot ###################################
 ################################################################################
 
 # S4 Genetic map subsets
@@ -318,270 +426,30 @@ dev.off()
 ########################### End map subsets ####################################
 ################################################################################
 
-
-# S5 variance components table 
-##############################
-
-library(asreml)
-
-path <- "~/MPP_EUNAM/data"
-
-setwd(path)
-
-pheno <- read.csv("./pheno/pheno_red.csv")
-pheno <- pheno[,-1]
-
-lines_used <- read.csv("./pheno/List_lines_Dent_Lehermeier.csv")
-
-# suppress the factor levels with 0 occurences
-
-pheno$Genotype <- as.factor(as.character(pheno$Genotype))
-pheno$Fam <- as.factor(as.character(pheno$Fam))
-
-# order data by family
-
-pheno <- pheno[order(pheno$Fam),]
-
-par_names <- c("B73","D06", "D09", "EC169", "F252", "F353", "F618", "F98902",
-               "Mo17", "UH250", "UH304","W117")
-
-# DMY
-#####
-
-model <- asreml(fixed = DMY~1, random= ~ Fam + at(Fam):Genotype + 
-                  at(Fam):LOC:Genotype + LOC:Rep + LOC:Rep:Block,
-                rcov=~at(Fam):units, data = pheno,
-                na.method.X = "omit", na.method.Y="omit")
-
-# variance component table
-
-var.DMY <- summary(model)$varcomp
-var.DMY <-round(cbind(var.DMY[c(2:11),c(2:3)], var.DMY[c(13:22),c(2:3)],
-                      var.DMY[c(26:35),2]),2)
-her <- round(100*(var.DMY[,1]/(var.DMY[,1] + (var.DMY[,3]/4) + (var.DMY[,5]/5))),2)
-var.DMY <- cbind(var.DMY[,-5], her)
-rownames(var.DMY) <- par_names[-c(6,8)]
-colnames(var.DMY) <- c("sigma.g", "std.err", "sigma.ge", "std.err","heritability")
-var.DMY
-
-
-var.DMY.Ltx <- print(xtable(var.DMY, align = c("l","c","c","c","c","c"),
-                            digits = c(2,2,2,2,2,2)))
-
-folder <- "E:/PhD/Manuscript/1st_chapter/Latex/table/"
-
-write(x = print(xtable(var.DMY, align = c("l","c","c","c","c","c"),
-                       digits = c(2,2,2,2,2,2))),
-      file=paste0(folder,"var.comp.DMY.txt"))
-
-# PH
-####
-
-model <- asreml(fixed = PH~1, random= ~ Fam + at(Fam):Genotype + 
-                  at(Fam):LOC:Genotype + LOC:Rep + LOC:Rep:Block,
-                rcov=~at(Fam):units, data = pheno,
-                na.method.X = "omit", na.method.Y="omit")
-
-# variance component table
-
-var.PH <- summary(model)$varcomp
-var.PH <-round(cbind(var.PH[c(2:11), c(2:3)], var.PH[c(13:22), c(2:3)],
-                     var.PH[c(26:35), 2]), 2)
-her <- round(100*(var.PH[, 1]/(var.PH[, 1] + (var.PH[, 3]/4) + (var.PH[, 5]/5))), 2)
-var.PH <- cbind(var.PH[, -5], her)
-rownames(var.PH) <- par_names[-c(6, 8)]
-colnames(var.PH) <- c("sigma.g", "std.err", "sigma.ge", "std.err","heritability")
-var.PH
-
-var.PH.Ltx <- print(xtable(var.PH, align = c("l","c","c","c","c","c"),
-                           digits = c(2,2,2,2,2,2)))
-
-folder <- "E:/PhD/Manuscript/1st_chapter/Latex/table/"
-
-write(x = print(xtable(var.PH, align = c("l","c","c","c","c","c"),
-                       digits = c(2,2,2,2,2,2))),
-      file=paste0(folder,"var.comp.PH.txt"))
-
-################################################################################
-########################### End var comp table #################################
-################################################################################
-
-# S6 Adjusted means descriptive statistics
-##########################################
-
-# phenotype
-
-path <- "~/MPP_EUNAM/data"
-
-setwd(path)
-
-# short
-
-pheno.sh <- read.csv("./pheno/pheno.short.sorted.csv", row.names = 1)
-
-cross.ind.sh <- substring(rownames(pheno.sh),1,5)
-cross.id.sh <- levels(as.factor(cross.ind.sh))
-
-variances.DMY.sh <- c()
-mean.DMY.sh <- c()
-
-for (i in 1:5) {
-  
-  # subset cross
-  
-  var.i<- var(pheno.sh$DMY[cross.ind.sh==cross.id.sh[i]])
-  
-  variances.DMY.sh <- c(variances.DMY.sh,var.i)
-  
-  mean.i <- mean(pheno.sh$DMY[cross.ind.sh==cross.id.sh[i]])
-  mean.DMY.sh <- c(mean.DMY.sh,mean.i)
-  
-}
-
-variances.PH.sh <- c()
-mean.PH.sh <- c()
-
-for (i in 1:5) {
-  
-  # subset cross
-  
-  var.i<- var(pheno.sh$PH[cross.ind.sh==cross.id.sh[i]])
-  
-  variances.PH.sh <- c(variances.PH.sh,var.i)
-  
-  mean.i <- mean(pheno.sh$PH[cross.ind.sh==cross.id.sh[i]])
-  mean.PH.sh <- c(mean.PH.sh,mean.i)
-  
-}
-
-
-# heterogeneous
-
-pheno.het <- read.csv("./pheno/pheno.hetero.sorted.csv", row.names = 1)
-
-cross.ind.het <- substring(rownames(pheno.het),1,5)
-cross.id.het <- levels(as.factor(cross.ind.het))
-
-variances.DMY.het <- c()
-mean.DMY.het <- c()
-
-for (i in 1:5) {
-  
-  # subset cross
-  
-  var.i<- var(pheno.het$DMY[cross.ind.het==cross.id.het[i]])
-  
-  variances.DMY.het <- c(variances.DMY.het,var.i)
-  
-  mean.i <- mean(pheno.het$DMY[cross.ind.het==cross.id.het[i]])
-  mean.DMY.het <- c(mean.DMY.het,mean.i)
-  
-}
-
-variances.PH.het <- c()
-mean.PH.het <- c()
-
-for (i in 1:5) {
-  
-  # subset cross
-  
-  var.i<- var(pheno.het$PH[cross.ind.het==cross.id.het[i]])
-  
-  variances.PH.het <- c(variances.PH.het,var.i)
-  
-  mean.i <- mean(pheno.het$PH[cross.ind.het==cross.id.het[i]])
-  mean.PH.het <- c(mean.PH.het,mean.i)
-  
-}
-
-
-# long
-
-pheno.lg <- read.csv("./pheno/pheno.long.sorted.csv", row.names = 1)
-
-cross.ind.lg <- substring(rownames(pheno.lg),1,5)
-cross.id.lg <- levels(as.factor(cross.ind.lg))
-
-variances.DMY.lg <- c()
-mean.DMY.lg <- c()
-
-for (i in 1:5) {
-  
-  # subset cross
-  
-  var.i<- var(pheno.lg$DMY[cross.ind.lg==cross.id.lg[i]])
-  
-  variances.DMY.lg <- c(variances.DMY.lg,var.i)
-  
-  mean.i <- mean(pheno.lg$DMY[cross.ind.lg==cross.id.lg[i]])
-  mean.DMY.lg <- c(mean.DMY.lg,mean.i)
-  
-}
-
-variances.PH.lg <- c()
-mean.PH.lg <- c()
-
-for (i in 1:5) {
-  
-  # subset cross
-  
-  var.i<- var(pheno.lg$PH[cross.ind.lg==cross.id.lg[i]])
-  
-  variances.PH.lg <- c(variances.PH.lg,var.i)
-  
-  mean.i <- mean(pheno.lg$PH[cross.ind.lg==cross.id.lg[i]])
-  mean.PH.lg <- c(mean.PH.lg,mean.i)
-  
-}
-
-
-# table descriptive statistics
-##############################
-
-mean.DMY <- c(mean.DMY.sh, mean.DMY.het, mean.DMY.lg)
-mean.PH <- c(mean.PH.sh, mean.PH.het, mean.PH.lg)
-
-variances.DMY <- c(variances.DMY.sh, variances.DMY.het, variances.DMY.lg)
-variances.PH <- c(variances.PH.sh, variances.PH.het, variances.PH.lg)
-
-
-crosses <- c(cross.id.sh, cross.id.het, cross.id.lg)
-parents <- c("D06","D09","F252","F618","UH304", "B73","D06","D09", "UH304",
-             "W117", "B73","EC169","Mo17","UH250","W117")
-
-table <- data.frame(crosses, parents, mean.DMY,
-                    variances.DMY, mean.PH, variances.PH)
-
-# export xtable
-
-colnames(table) <- c("Cross","Parent2","mean DMY","var. DMY",
-                     "mean PH","var. PH")
-
-table.Ltx <- print(xtable(table,digits = c(1,1,1,1,1,1,1),
-                          align = c("l","l","l","c","c","c","c")),
-                   include.rownames=FALSE)
-
-folder <- "E:/PhD/Manuscript/1st_chapter/Latex/table/"
-
-write(x = print(xtable(table,digits = c(1,1,1,1,1,1,1),
-                       align = c("l","l","l","c","c","c","c")),
-                include.rownames=FALSE),
-      file=paste(folder,"des_stat_trait.txt",sep = ""))
-
-################################################################################
-########################### End descriptive stat ###############################
-################################################################################
-
 # S7 Genetic variance versus parental relatedness
 #################################################
 
-path <- "~/MPP_EUNAM/"
+library(asreml)
+library(mppR)
+library(xtable)
+library(ggplot2)
+
+
+path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
 
 setwd(path)
 
-library(mppRDraft)
-library(xtable)
-library(ggplot2)
+# Genotype
+
+geno.par <- read.csv("./data/geno/geno_panzea_par.csv", row.names = 1)
+geno.par <- as.matrix(geno.par)
+
+# SM coefficient distance between parents
+
+kin.mat.par <- SM_comp(mk.mat = geno.par)
+
+SM <- kin.mat.par[6, ]
+SM <- SM[-6]
 
 crosses <- c("CFD02","CFD03","CFD04","CFD05","CFD06","CFD07",
              "CFD09","CFD10","CFD11","CFD12")
@@ -589,33 +457,13 @@ crosses <- c("CFD02","CFD03","CFD04","CFD05","CFD06","CFD07",
 parent2 <- c("B73","D06","D09","EC169","F252","F618","Mo17",
              "UH250","UH304","W117")
 
-# compute SM coefficients
-
-# Genotype
-
-geno.par <- read.csv("./data/geno/geno_panzea_par.csv", row.names = 1)
-
-# SM coefficient distance between the central parent (F353)
-
-kin.mat.par <- kinship.matrix(mk.mat = geno.par, method = "SM")
-
-SM <- kin.mat.par[6, ]
-SM <- SM[-6]
-
 
 # compute genetic variance
 ##########################
 
-library(asreml)
+pheno <- read.csv("./data/pheno/pheno_red.csv", row.names = 1)
 
-path <- "~/MPP_EUNAM/data"
-
-setwd(path)
-
-pheno <- read.csv("./pheno/pheno_red.csv")
-pheno <- pheno[,-1]
-
-lines_used <- read.csv("./pheno/List_lines_Dent_Lehermeier.csv")
+lines_used <- read.csv("./data/pheno/List_lines_Dent_Lehermeier.csv")
 
 # suppress the factor levels with 0 occurences
 
@@ -653,7 +501,7 @@ model <- asreml(fixed = PH~1, random= ~ Fam + at(Fam):Genotype +
 PH.var <- summary(model)$varcomp
 PH.var <- PH.var[c(3:12), 2]
 
-data <- data.frame(crosses, parent2,SM,DMY.var,PH.var)
+data <- data.frame(crosses, parent2, SM, DMY.var, PH.var)
 
 plot(SM, DMY.var)
 
@@ -662,7 +510,7 @@ plot(SM, PH.var)
 
 # DMY
 
-p0 <- ggplot(data, aes(x=SM, y=DMY.var, label=parent2)) +
+p0 <- ggplot(data, aes(x = SM, y = DMY.var, label = parent2)) +
   
   geom_point(shape=1, size=4) +    # Use hollow circles
   
@@ -693,7 +541,9 @@ p0 <- ggplot(data, aes(x=SM, y=DMY.var, label=parent2)) +
 
 # save plot
 
-jpeg(filename = "DMY_pop_gen_vs_rel.jpg",width = 1200,height = 1200,
+setwd("E:/PhD/Manuscript/1st_chapter/Latex/figures")
+
+jpeg(filename = "DMY_pop_gen_vs_rel.jpg", width = 1200, height = 1200,
      quality = 100, res = 100)
 
 p0
@@ -701,143 +551,7 @@ p0
 dev.off()
 
 
-# DMY short
-
-par.short <- c("UH304", "D06","D09","F252","F618")
-
-data.short <- data[data$parent2 %in% par.short,]
-
-
-p1 <- ggplot(data.short, aes(x=SM, y=DMY.var, label=parent2)) +
-  
-  geom_point(shape=1, size=4) +    # Use hollow circles
-  
-  geom_text(hjust = 0.5, vjust=-1) + 
-  
-  stat_smooth(method = "lm", aes(colour="linear"), formula = y ~ poly(x, 1),
-              size = 1, se = FALSE) +
-  stat_smooth(method = "lm", aes(colour="quadratic"), formula = y ~ poly(x, 2),
-              size = 1,se = FALSE) +
-  
-  theme_bw() +
-  
-  scale_colour_brewer(name = 'Trend', palette = 'Set2') +
-  
-  theme(                              
-    axis.title.x = element_text(face="bold", color="black", size=16),
-    axis.title.y = element_text(face="bold", color="black", size=16),
-    plot.title = element_text(face="bold", color = "black", size=20),
-    legend.position=c(1,1),
-    legend.justification=c(1,1),
-    legend.title = element_text(colour=1, size=14, face="bold"),
-    legend.text = element_text(colour=1, size=14)) +
-  
-  
-  labs(x="genetic relatedness (SM)", 
-       y = "genetic variance", 
-       title= "DMY short population")
-
-# save plot
-
-jpeg(filename = "DMY_short_gen_vs_rel.jpg",width = 1200,height = 1200,
-     quality = 100, res = 100)
-
-p1
-
-dev.off()
-
-# DMY long
-
-par.long <- c("B73","EC169","Mo17", "UH250","W117")
-
-data.long <- data[data$parent2 %in% par.long,]
-
-p2 <- ggplot(data.long, aes(x=SM, y=DMY.var, label=parent2)) +
-  
-  geom_point(shape=1, size=4) +    # Use hollow circles
-  
-  geom_text(hjust = 0.5, vjust=-1) + 
-  
-  stat_smooth(method = "lm", aes(colour="linear"), formula = y ~ poly(x, 1),
-              size = 1, se = FALSE) +
-  stat_smooth(method = "lm", aes(colour="quadratic"), formula = y ~ poly(x, 2),
-              size = 1,se = FALSE) +
-  
-  theme_bw() +
-  
-  scale_colour_brewer(name = 'Trend', palette = 'Set2') +
-  
-  theme(                              
-    axis.title.x = element_text(face="bold", color="black", size=16),
-    axis.title.y = element_text(face="bold", color="black", size=16),
-    plot.title = element_text(face="bold", color = "black", size=20),
-    legend.position=c(1,1),
-    legend.justification=c(1,1),
-    legend.title = element_text(colour=1, size=14, face="bold"),
-    legend.text = element_text(colour=1, size=14)) +
-  
-  
-  labs(x="genetic relatedness (SM)", 
-       y = "genetic variance", 
-       title= "DMY long population")
-
-# save plot
-
-jpeg(filename = "DMY_long_gen_vs_rel.jpg",width = 1200,height = 1200,
-     quality = 100, res = 100)
-
-p2
-
-dev.off()
-
-# DMY hetero
-
-par.hetero <- c("UH304", "D06","D09","W117","B73")
-
-data.hetero <- data[data$parent2 %in% par.hetero,]
-
-p3 <- ggplot(data.hetero, aes(x=SM, y=DMY.var, label=parent2)) +
-  
-  geom_point(shape=1, size=4) +    # Use hollow circles
-  
-  geom_text(hjust = 0.5, vjust=-1) + 
-  
-  stat_smooth(method = "lm", aes(colour="linear"), formula = y ~ poly(x, 1),
-              size = 1, se = FALSE) +
-  stat_smooth(method = "lm", aes(colour="quadratic"), formula = y ~ poly(x, 2),
-              size = 1,se = FALSE) +
-  
-  theme_bw() +
-  
-  scale_colour_brewer(name = 'Trend', palette = 'Set2') +
-  
-  theme(                              
-    axis.title.x = element_text(face="bold", color="black", size=16),
-    axis.title.y = element_text(face="bold", color="black", size=16),
-    plot.title = element_text(face="bold", color = "black", size=20),
-    legend.position=c(1,1),
-    legend.justification=c(1,1),
-    legend.title = element_text(colour=1, size=14, face="bold"),
-    legend.text = element_text(colour=1, size=14)) +
-  
-  
-  labs(x="genetic relatedness (SM)", 
-       y = "genetic variance", 
-       title= "DMY heterogeneous population")
-
-# save plot
-
-jpeg(filename = "DMY_hetero_gen_vs_rel.jpg",width = 1200,height = 1200,
-     quality = 100, res = 100)
-
-p3
-
-dev.off()
-
-################################################################################
-################## Plant height ################################################
-################################################################################
-
+# PH
 
 p0 <- ggplot(data, aes(x=SM, y=PH.var, label=parent2)) +
   
@@ -878,142 +592,12 @@ p0
 dev.off()
 
 
-# PH short
-
-par.short <- c("UH304", "D06","D09","F252","F618")
-
-data.short <- data[data$parent2 %in% par.short,]
-
-
-p1 <- ggplot(data.short, aes(x=SM, y=PH.var, label=parent2)) +
-  
-  geom_point(shape=1, size=4) +    # Use hollow circles
-  
-  geom_text(hjust = 0.5, vjust=-1) + 
-  
-  stat_smooth(method = "lm", aes(colour="linear"), formula = y ~ poly(x, 1),
-              size = 1, se = FALSE) +
-  stat_smooth(method = "lm", aes(colour="quadratic"), formula = y ~ poly(x, 2),
-              size = 1,se = FALSE) +
-  
-  theme_bw() +
-  
-  scale_colour_brewer(name = 'Trend', palette = 'Set2') +
-  
-  theme(                              
-    axis.title.x = element_text(face="bold", color="black", size=16),
-    axis.title.y = element_text(face="bold", color="black", size=16),
-    plot.title = element_text(face="bold", color = "black", size=20),
-    legend.position=c(1,1),
-    legend.justification=c(1,1),
-    legend.title = element_text(colour=1, size=14, face="bold"),
-    legend.text = element_text(colour=1, size=14)) +
-  
-  
-  labs(x="genetic relatedness (SM)", 
-       y = "genetic variance", 
-       title= "PH short population")
-
-# save plot
-
-jpeg(filename = "PH_short_gen_vs_rel.jpg",width = 1200,height = 1200,
-     quality = 100, res = 100)
-
-p1
-
-dev.off()
-
-# PH long
-
-par.long <- c("B73","EC169","Mo17", "UH250","W117")
-
-data.long <- data[data$parent2 %in% par.long,]
-
-p2 <- ggplot(data.long, aes(x=SM, y=PH.var, label=parent2)) +
-  
-  geom_point(shape=1, size=4) +    # Use hollow circles
-  
-  geom_text(hjust = 0.5, vjust=-1) + 
-  
-  stat_smooth(method = "lm", aes(colour="linear"), formula = y ~ poly(x, 1),
-              size = 1, se = FALSE) +
-  stat_smooth(method = "lm", aes(colour="quadratic"), formula = y ~ poly(x, 2),
-              size = 1,se = FALSE) +
-  
-  theme_bw() +
-  
-  scale_colour_brewer(name = 'Trend', palette = 'Set2') +
-  
-  theme(                              
-    axis.title.x = element_text(face="bold", color="black", size=16),
-    axis.title.y = element_text(face="bold", color="black", size=16),
-    plot.title = element_text(face="bold", color = "black", size=20),
-    legend.position=c(1,1),
-    legend.justification=c(1,1),
-    legend.title = element_text(colour=1, size=14, face="bold"),
-    legend.text = element_text(colour=1, size=14)) +
-  
-  
-  labs(x="genetic relatedness (SM)", 
-       y = "genetic variance", 
-       title= "PH long population")
-
-# save plot
-
-jpeg(filename = "PH_long_gen_vs_rel.jpg",width = 1200,height = 1200,
-     quality = 100, res = 100)
-
-p2
-
-dev.off()
-
-# PH hetero
-
-par.hetero <- c("UH304", "D06","D09","W117","B73")
-
-data.hetero <- data[data$parent2 %in% par.hetero,]
-
-p3 <- ggplot(data.hetero, aes(x=SM, y=PH.var, label=parent2)) +
-  
-  geom_point(shape=1, size=4) +    # Use hollow circles
-  
-  geom_text(hjust = 0.5, vjust=-1) + 
-  
-  stat_smooth(method = "lm", aes(colour="linear"), formula = y ~ poly(x, 1),
-              size = 1, se = FALSE) +
-  stat_smooth(method = "lm", aes(colour="quadratic"), formula = y ~ poly(x, 2),
-              size = 1,se = FALSE) +
-  
-  theme_bw() +
-  
-  scale_colour_brewer(name = 'Trend', palette = 'Set2') +
-  
-  theme(                              
-    axis.title.x = element_text(face="bold", color="black", size=16),
-    axis.title.y = element_text(face="bold", color="black", size=16),
-    plot.title = element_text(face="bold", color = "black", size=20),
-    legend.position=c(1,1),
-    legend.justification=c(1,1),
-    legend.title = element_text(colour=1, size=14, face="bold"),
-    legend.text = element_text(colour=1, size=14)) +
-  
-  
-  labs(x="genetic relatedness (SM)", 
-       y = "genetic variance", 
-       title= "PH heterogeneous population")
-
-# save plot
-
-jpeg(filename = "PH_hetero_gen_vs_rel.jpg",width = 1200,height = 1200,
-     quality = 100, res = 100)
-
-p3
-
-dev.off()
-
 ################################################################################
 #################### End Genetic variance vs relatedness  ######################
 ################################################################################
+
+
+############### stop there
 
 # S11 threshold table
 ######################
