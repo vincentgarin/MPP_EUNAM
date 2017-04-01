@@ -132,7 +132,108 @@ write(x = print(xtable(subset.part,digits = c(0,0,0,3,1,1,1,0,1,1,1,0,0,0),
 ############################# End Table 1 ######################################
 ################################################################################
 
-############# stop there
+# Table 2
+#########
+
+library(xtable)
+library(ggplot2)
+
+
+folder <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/results2/QTL_analyses/"
+
+# DMY
+
+subset <- c(rep("short", 8), rep("hetero", 8), rep("long", 8))
+VCOV <- rep(c(rep("h.err", 4), rep("cr.err", 4)), 3)
+Q.eff <- rep(c("par", "anc", "biall", "MQE"), 6)
+
+partition <- cbind(subset, Q.eff, VCOV)
+
+res_DMY <- matrix("-", 6, 4)
+
+i.ind <- rep(1:6, each = 4)
+j.ind <- rep(1:4, time = 6)
+
+
+for (i in 1:dim(partition)[1]){
+  
+  part <- partition[i, ]
+  
+  # load the data
+  
+  if(part[2] == "MQE"){
+    
+    res_DMY[i.ind[i], j.ind[i]] <- "-"
+    
+  } else {
+    
+    file <- paste0(folder, paste0("QTLan_", part[1], "_DMY_", part[2],
+                                  "_", part[3]), "/QTL_genResults.txt")
+    
+    res <- tryCatch(read.table(file, row.names = 1), error = function(e) NULL)
+    
+    if(!is.null(res)){
+      
+      N.QTL <- round(res[1, ], 0)
+      
+      R2 <- round(res[3, ], 1)
+      
+      res_DMY[i.ind[i], j.ind[i]] <- paste(N.QTL, paste0("(", R2, ")"))
+      
+    }
+    
+  }
+  
+}
+
+res_DMY
+
+res_PH <- matrix("-", 6, 4)
+
+i.ind <- rep(1:6, each = 4)
+j.ind <- rep(1:4, time = 6)
+
+
+for (i in 1:dim(partition)[1]){
+  
+  part <- partition[i, ]
+  
+  # load the data
+  
+  if(part[2] == "MQE"){
+    
+    res_PH[i.ind[i], j.ind[i]] <- "-"
+    
+  } else {
+    
+    file <- paste0(folder, paste0("QTLan_", part[1], "_PH_", part[2],
+                                  "_", part[3]), "/QTL_genResults.txt")
+    
+    res <- tryCatch(read.table(file, row.names = 1), error = function(e) NULL)
+    
+    if(!is.null(res)){
+      
+      N.QTL <- round(res[1, ], 0)
+      
+      R2 <- round(res[3, ], 1)
+      
+      res_PH[i.ind[i], j.ind[i]] <- paste(N.QTL, paste0("(", R2, ")"))
+      
+    }
+    
+  }
+  
+}
+
+res_PH
+
+# for the whole table
+
+Tab2 <- cbind(res_DMY, rep("", 6), res_PH)
+
+################################################################################
+############################# End Table 2 ######################################
+################################################################################
 
 # Figure 3
 ##########
