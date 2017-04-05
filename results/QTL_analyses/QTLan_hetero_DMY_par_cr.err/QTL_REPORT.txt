@@ -1,0 +1,33 @@
+hetero DMY par cr.err
+*********************
+
+Number of QTL(s): 1
+
+Global R2: 10.19
+
+Global adjusted R2: 8.91
+
+
+
+QTL 1
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-108061059   8   53.5  7.157226
+
+
+QTL effect per cross or parent:
+
+            Effect   Std.Err     W-stat      p-value Sign Con.part Par.all
+Q1F353   0.0000000 0.0000000  0.0000000 1.000000e+00        ref.c1      AA
+Q1UH304 -3.4448463 1.9277054  3.1934369 7.393442e-02    .       c1    <NA>
+Q1D09   -5.8792064 1.1544773 25.9338288 3.533228e-07  ***       c1      BB
+Q1D06   -2.4781553 0.9929621  6.2286184 1.257018e-02    *       c1      BB
+Q1W117   0.4216211 1.1904258  0.1254412 7.232064e-01            c1      AA
+Q1B73   -3.4219831 1.3787953  6.1596514 1.306970e-02    *       c1      AA
+
+
+Partial adj. R2 (%): 8.91
+

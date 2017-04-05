@@ -1,0 +1,6 @@
+"short.cross" "long.cross" "hetero.cross" "par.short" "par.long" "par.hetero"
+"1" "CFD11" "CFD10" "CFD11" "UH304" "UH250" "UH304"
+"2" "CFD06" "CFD09" "CFD04" "F252" "Mo17" "D09"
+"3" "CFD04" "CFD12" "CFD03" "D09" "W117" "D06"
+"4" "CFD07" "CFD05" "CFD12" "F618" "EC169" "W117"
+"5" "CFD03" "CFD02" "CFD02" "D06" "B73" "B73"

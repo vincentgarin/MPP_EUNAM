@@ -1,0 +1,81 @@
+short DMY par cr.err
+********************
+
+Number of QTL(s): 3
+
+Global R2: 22.8
+
+Global adjusted R2: 19.41
+
+
+
+QTL 1
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-106000112   6      0  8.982817
+
+
+QTL effect per cross or parent:
+
+           Effect   Std.Err     W-stat      p-value Sign Con.part Par.all
+Q1F353   0.000000 0.0000000  0.0000000 1.000000e+00        ref.c1      AA
+Q1UH304 -2.393281 1.2462785  3.1526164 7.580533e-02    .       c1      BB
+Q1F252  -2.168644 0.9779369  4.7275863 2.968251e-02    *       c1      BB
+Q1D09   -5.767985 1.0532577 21.6670664 3.243117e-06  ***       c1      BB
+Q1F618  -2.886109 0.8617898  8.5688408 3.419648e-03   **       c1      BB
+Q1D06    1.198144 1.3419369  0.4481975 5.031922e-01            c1      BB
+
+
+Partial adj. R2 (%): 9.92
+
+
+
+QTL 2
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-107072124   7   61.4  5.664524
+
+
+QTL effect per cross or parent:
+
+            Effect   Std.Err     W-stat      p-value Sign Con.part Par.all
+Q2F353   0.0000000 0.0000000  0.0000000 1.000000e+00        ref.c1      BB
+Q2UH304 -0.7801782 1.2139993  0.1444058 7.039398e-01            c1      AA
+Q2F252   0.4565859 1.0056488  0.4465455 5.039800e-01            c1      BB
+Q2D09    5.7471518 1.0839638 25.5065810 4.408765e-07  ***       c1      BB
+Q2F618   1.3357531 0.8594295  1.0099335 3.149188e-01            c1      AA
+Q2D06   -2.3293589 1.3312620  2.8759999 8.990912e-02    .       c1      BB
+
+
+Partial adj. R2 (%): 6.05
+
+
+
+QTL 3
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-108023009   8   42.9   6.34471
+
+
+QTL effect per cross or parent:
+
+            Effect   Std.Err     W-stat      p-value Sign Con.part Par.all
+Q3F353   0.0000000 0.0000000  0.0000000 1.0000000000        ref.c1      BB
+Q3UH304 -4.8146571 1.2674431 14.4302480 0.0001454473  ***       c1    <NA>
+Q3F252  -3.4459790 0.9879012 12.1674111 0.0004863176  ***       c1      AA
+Q3D09   -1.8226240 1.0806566  2.8445838 0.0916823339    .       c1      AA
+Q3F618  -2.4396956 0.8715874  7.8351869 0.0051238856   **       c1      AA
+Q3D06   -0.7549892 1.3117709  0.3312574 0.5649196400            c1      AA
+
+
+Partial adj. R2 (%): 7.37
+

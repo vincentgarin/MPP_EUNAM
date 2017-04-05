@@ -44,12 +44,14 @@ library(outliers)
 # 1. Adjusted means computation  #
 ##################################
 
-# 1.1 load data 
+# 1.1 load data
 ##############
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
+
+# path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
 
 setwd(path)
 
@@ -86,10 +88,10 @@ loc.id <- levels(pheno$LOC)
 median.NBPL <- c()
 
 for(i in 1:4){
-  
+
   median.i <- median(pheno$NBPL[pheno$LOC == loc.id[i]])
   median.NBPL <- c(median.NBPL, median.i)
-  
+
 }
 
 # determine per location which plot contain 70% less plant than the number of
@@ -98,10 +100,10 @@ for(i in 1:4){
 missing.plot <- c()
 
 for(i in 1:4){
-  
+
   missing.plot.i <- pheno$NBPL[pheno$LOC == loc.id[i]] < (median.NBPL[i] * 0.7)
   missing.plot <- c(missing.plot, missing.plot.i)
-  
+
 }
 
 
@@ -113,7 +115,7 @@ pheno[missing.plot, 9:10] <- NA
 ###################################################
 
 # Grubb test applied on the residual of a mixed model. If the residual of the
-# mixed model contained an outlying observation (Grubb test pval< 0.05), the 
+# mixed model contained an outlying observation (Grubb test pval< 0.05), the
 # plot value for this specific trait with the largest residual is put as missing.
 # This procedure is applied iteratively until no extreme value is detected.
 # The test is done for the 5 traits.
@@ -126,58 +128,58 @@ pos.id <- c(9, 10, 11, 12, 13)
 library(outliers)
 
 for (i in 1:5){
-  
+
   fix_formula <- paste(trait.id[i],"~1",sep="")
-  
+
   # set initial value for p_val
-  
+
   p_val <- 0.01
   count <- 0
-  
+
   while(p_val < 0.05){
-    
+
     # compute the mixed model
-    
+
     model <- asreml(fixed = as.formula(fix_formula), random = ~ Genotype + LOC +
                       Genotype:LOC + LOC:Rep +  LOC:Rep:Block,
                     rcov= ~ idv(units), data = pheno, trace = FALSE)
-    
+
     # compute the residuals
     res <- model$residuals
-    
+
     # do the Grubbs test on the residuals
     test <- grubbs.test(res, type = 10, two.sided = TRUE)
-    
+
     # get the p-val of the test
     p_val <- test$p.value
-    
+
     # test if p_val is lower than 0.05 (presence of an outlier)
     if(p_val < 0.05){
-      
+
       # remove the outlying value from the data
-      
+
       # check if there are missing values within the residuals
-      
+
       if(sum(is.na(res))>0){
-        
+
         pheno[which(abs(res) == max(abs(res[-which(is.na(res))]))),
               pos.id[i]] <- NA
-        
+
         count <- count + 1
-        
-        
+
+
       } else {
-        
-        
+
+
         pheno[which(abs(res) == max(abs(res))), pos.id[i]] <- NA
         count <- count + 1
-        
+
       }
-      
+
     }
-    
+
   }
-  
+
 }
 
 
@@ -214,7 +216,7 @@ write.csv(pheno,"./data/pheno/pheno_red.csv")
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -240,18 +242,18 @@ Adj_means <- matrix(0, dim(lines_used)[1], 5)
 
 
 for (i in 1:5){
-  
+
   fix_formula <- paste(trait.id[i], " ~ 1 + Genotype", sep = "")
   model <- asreml(fixed = as.formula(fix_formula),
                   random = ~  LOC:Genotype + LOC:Rep + LOC:Rep:Block,
                   rcov = ~ idv(units), data = pheno,
                   na.method.X = "omit", na.method.Y="omit")
-  
+
   pred <- predict(model, classify = "Genotype")
   index <- pred$predictions$pvals$Genotype %in% lines_used[, 1]
   Adj_means[, i] <- pred$predictions$pvals$predicted.value[index]
-  
-} 
+
+}
 
 colnames(Adj_means) <- c("DMY","DMC","PH","DtTAS","DtSILK")
 rownames(Adj_means) <- lines_used[, 1]
@@ -278,7 +280,7 @@ rm(variable)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -395,7 +397,7 @@ rm(variable)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -429,11 +431,11 @@ geno.id <- geno[36, ]
 geno.id2 <- c()
 
 for (i in 2:2291) {
-  
+
   name <- strsplit(as.character(geno.id[, i]), split = ",", fixed = TRUE)[[1]][2]
-  
+
   geno.id2 <- c(geno.id2, name)
-  
+
 }
 
 geno.id3 <- substring(geno.id2, 2, nchar(geno.id2))
@@ -475,7 +477,7 @@ options(scipen = 999)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -494,14 +496,14 @@ rownames(family) <- rownames(geno.imp)
 mk.list.ph <- c()
 
 for(i in 1:10){
-  
+
   # subset chr i
-  
+
   map_i <- map[map$chr_ph == i,]
   map_i_ord <- map_i[order(map_i$bp), ]
-  
+
   mk.list.ph <- rbind(mk.list.ph, map_i_ord[, c(1, 5, 6)])
-  
+
 }
 
 # remove the marker that are at the same position
@@ -533,7 +535,7 @@ geno.imp <- gp.imp$geno
 
 # select the marker used for imputation
 
-geno <- geno[, colnames(geno.imp)] 
+geno <- geno[, colnames(geno.imp)]
 map <- map[map[, 1] %in% colnames(geno.imp), ]
 
 # order the markers of the genotype matrix according to genetic distances
@@ -579,7 +581,7 @@ rm(variable)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -653,7 +655,7 @@ library(mppR)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -721,9 +723,6 @@ data_short_IBD <- mppData_form(geno.off = data_IBD$geno.off,
 
 saveRDS(data_short_IBD, file = "./data/mpp_data/data_short_IBD.rds")
 
-# reduced mppData object for CV
-
-# data_short_IBD <- readRDS("./data/mpp_data/data_short_IBD.rds")
 
 map <- data_short_IBD$map
 
@@ -734,34 +733,34 @@ chr.ind <- unique(map[, 2])
 bin.ind <- c()
 
 for(i in chr.ind){
-  
+
   map_i <- map[map[, 2] == i, ]
-  
+
   int.mk.dist_i <- c(0, diff(map_i[, 4]))
   cum.dist <- 0
   bin.ind_i <- c()
   bin.nb <- 1
-  
+
   for(j in 1:dim(map_i)[1]){
-    
+
     cum.dist <- cum.dist + int.mk.dist_i[j]
-    
+
     if(cum.dist < 1.05){
-      
+
       bin.ind_i <- c(bin.ind_i, paste0("chr", i, "_", bin.nb))
-      
+
     } else{
-      
+
       bin.nb <- bin.nb + 1
       bin.ind_i <- c(bin.ind_i, paste0("chr",i, "_", bin.nb))
       cum.dist <- 0
-      
+
     }
-    
+
   }
-  
+
   bin.ind <- c(bin.ind, bin.ind_i)
-  
+
 }
 
 
@@ -774,17 +773,16 @@ mk.sel <- c()
 bin.ind.id <- unique(bin.ind)
 
 for (i in 1:length(bin.ind.id)){
-  
+
   maf_i <- maf.aug[(bin.ind == bin.ind.id[i]), , drop = FALSE]
   mk.sel <- c(mk.sel, maf_i[which.max(maf_i[, 1]), 2])
-  
+
 }
 
 data_short_IBD_red <- mppData_subset(mk.list = mk.sel, mppData = data_short_IBD)
 
 saveRDS(data_short_IBD_red, file = "./data/mpp_data/data_short_IBD_red.rds")
 
-############################## end reduced mppData object for CV
 
 # 5.2 IBS mppData object
 ########################
@@ -819,9 +817,6 @@ data_short_IBS$geno.par <- data.frame(data_short_IBS$map, t(geno.par),
 
 saveRDS(data_short_IBS,file = "./data/mpp_data/data_short_IBS.rds")
 
-# reduced mppData object for CV
-
-# data_short_IBS <- readRDS("./data/mpp_data/data_short_IBS.rds")
 
 data_short_IBS_red <- mppData_subset(mk.list = mk.sel, mppData = data_short_IBS)
 
@@ -833,7 +828,7 @@ saveRDS(data_short_IBS_red, file = "./data/mpp_data/data_short_IBS_red.rds")
 ### This part need to be executed on R 2.14 to be able to run clusthaplo
 # and RHmm at the same time !!!
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -847,7 +842,7 @@ hap_map <- read.table("./data/map/hap_map_sh.txt", stringsAsFactors = FALSE)
 mk_data <- read.table("./data/geno/hap_geno_sh.txt", stringsAsFactors = FALSE,
                       check.names = FALSE)
 
-data <- readRDS("./data/mpp_data/data_short_IBD.rds")  
+data <- readRDS("./data/mpp_data/data_short_IBD.rds")
 cons_map <- data$map[, -3]
 
 set.seed(26589)
@@ -863,7 +858,7 @@ par.clu.short <- cluster[[1]] # clustering results
 
 # save the parent clustering results
 
-write.table(par.clu.short,"./data/clustering/par_clu_short2.txt")
+write.table(par.clu.short,"./data/clustering/par_clu_short.txt")
 
 
 ################################################################################
@@ -878,7 +873,7 @@ write.table(par.clu.short,"./data/clustering/par_clu_short2.txt")
 
 library(mppR)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -947,9 +942,6 @@ data_het_IBD <- mppData_form(geno.off = data_IBD$geno.off,
 
 saveRDS(data_het_IBD, file = "./data/mpp_data/data_hetero_IBD.rds")
 
-################### reduced mppData object for CV
-
-# data_het_IBD <- readRDS("./data/mpp_data/data_hetero_IBD.rds")
 
 map <- data_het_IBD$map
 
@@ -962,34 +954,34 @@ chr.ind <- unique(map[, 2])
 bin.ind <- c()
 
 for(i in chr.ind){
-  
+
   map_i <- map[map[, 2] == i, ]
-  
+
   int.mk.dist_i <- c(0, diff(map_i[, 4]))
   cum.dist <- 0
   bin.ind_i <- c()
   bin.nb <- 1
-  
+
   for(j in 1:dim(map_i)[1]){
-    
+
     cum.dist <- cum.dist + int.mk.dist_i[j]
-    
+
     if(cum.dist < 1.05){
-      
+
       bin.ind_i <- c(bin.ind_i, paste0("chr", i, "_", bin.nb))
-      
+
     } else{
-      
+
       bin.nb <- bin.nb + 1
       bin.ind_i <- c(bin.ind_i, paste0("chr",i, "_", bin.nb))
       cum.dist <- 0
-      
+
     }
-    
+
   }
-  
+
   bin.ind <- c(bin.ind, bin.ind_i)
-  
+
 }
 
 geno.off.red <- geno.off[, map[, 1]]
@@ -1001,17 +993,16 @@ mk.sel <- c()
 bin.ind.id <- unique(bin.ind)
 
 for (i in 1:length(bin.ind.id)){
-  
+
   maf_i <- maf.aug[(bin.ind == bin.ind.id[i]), , drop = FALSE]
   mk.sel <- c(mk.sel, maf_i[which.max(maf_i[, 1]), 2])
-  
+
 }
 
 data_het_IBD_red <- mppData_subset(mk.list = mk.sel, mppData = data_het_IBD)
 
 saveRDS(data_het_IBD_red, file = "./data/mpp_data/data_hetero_IBD_red.rds")
 
-############################## end reduced mppData object for CV
 
 # 6.2 IBS mppData object
 ########################
@@ -1045,9 +1036,6 @@ data_het_IBS$geno.par <- data.frame(data_het_IBS$map, t(geno.par),
 
 saveRDS(data_het_IBS,file = "./data/mpp_data/data_hetero_IBS.rds")
 
-# reduced mppData object for CV
-
-# data_het_IBS <- readRDS("./data/mpp_data/data_hetero_IBS.rds")
 
 data_het_IBS_red <- mppData_subset(mk.list = mk.sel, mppData = data_het_IBS)
 
@@ -1059,7 +1047,7 @@ saveRDS(data_het_IBS_red, file = "./data/mpp_data/data_hetero_IBS_red.rds")
 ### This part need to be executed on R 2.14 to be able to run clusthaplo
 # and RHmm at the same time !!!
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -1073,7 +1061,7 @@ hap_map <- read.table("./data/map/hap_map_het.txt", stringsAsFactors = FALSE)
 mk_data <- read.table("./data/geno/hap_geno_het.txt", stringsAsFactors = FALSE,
                       check.names = FALSE)
 
-data <- readRDS("./data/mpp_data/data_hetero_IBD.rds")  
+data <- readRDS("./data/mpp_data/data_hetero_IBD.rds")
 cons_map <- data$map[, -3]
 
 set.seed(3687918)
@@ -1089,7 +1077,7 @@ par.clu.het <- cluster[[1]] # clustering results
 
 # save the parent clustering results
 
-write.table(par.clu.het,"./data/clustering/par_clu_hetero2.txt")
+write.table(par.clu.het,"./data/clustering/par_clu_hetero.txt")
 
 
 ################################################################################
@@ -1104,7 +1092,7 @@ write.table(par.clu.het,"./data/clustering/par_clu_hetero2.txt")
 
 library(mppR)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -1173,9 +1161,6 @@ data_long_IBD <- mppData_form(geno.off = data_IBD$geno.off,
 
 saveRDS(data_long_IBD, file = "./data/mpp_data/data_long_IBD.rds")
 
-################### reduced mppData object for CV
-
-# data_long_IBD <- readRDS("./data/mpp_data/data_long_IBD.rds")
 
 map <- data_long_IBD$map
 
@@ -1188,34 +1173,34 @@ chr.ind <- unique(map[, 2])
 bin.ind <- c()
 
 for(i in chr.ind){
-  
+
   map_i <- map[map[, 2] == i, ]
-  
+
   int.mk.dist_i <- c(0, diff(map_i[, 4]))
   cum.dist <- 0
   bin.ind_i <- c()
   bin.nb <- 1
-  
+
   for(j in 1:dim(map_i)[1]){
-    
+
     cum.dist <- cum.dist + int.mk.dist_i[j]
-    
+
     if(cum.dist < 1){
-      
+
       bin.ind_i <- c(bin.ind_i, paste0("chr", i, "_", bin.nb))
-      
+
     } else{
-      
+
       bin.nb <- bin.nb + 1
       bin.ind_i <- c(bin.ind_i, paste0("chr",i, "_", bin.nb))
       cum.dist <- 0
-      
+
     }
-    
+
   }
-  
+
   bin.ind <- c(bin.ind, bin.ind_i)
-  
+
 }
 
 geno.off.red <- geno.off[, map[, 1]]
@@ -1227,17 +1212,16 @@ mk.sel <- c()
 bin.ind.id <- unique(bin.ind)
 
 for (i in 1:length(bin.ind.id)){
-  
+
   maf_i <- maf.aug[(bin.ind == bin.ind.id[i]), , drop = FALSE]
   mk.sel <- c(mk.sel, maf_i[which.max(maf_i[, 1]), 2])
-  
+
 }
 
 data_long_IBD_red <- mppData_subset(mk.list = mk.sel, mppData = data_long_IBD)
 
 saveRDS(data_long_IBD_red, file = "./data/mpp_data/data_long_IBD_red.rds")
 
-############################## end reduced mppData object for CV
 
 # 7.2 IBS mppData object
 ########################
@@ -1283,7 +1267,7 @@ saveRDS(data_long_IBS_red, file = "./data/mpp_data/data_long_IBS_red.rds")
 ### This part need to be executed on R 2.14 to be able to run clusthaplo
 # and RHmm at the same time !!!
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -1297,7 +1281,7 @@ hap_map <- read.table("./data/map/hap_map_lg.txt", stringsAsFactors = FALSE)
 mk_data <- read.table("./data/geno/hap_geno_lg.txt", stringsAsFactors = FALSE,
                       check.names = FALSE)
 
-data <- readRDS("./data/mpp_data/data_long_IBD.rds")  
+data <- readRDS("./data/mpp_data/data_long_IBD.rds")
 cons_map <- data$map[, -3]
 
 set.seed(6873)
@@ -1313,7 +1297,7 @@ par.clu.lg <- cluster[[1]] # clustering results
 
 # save the parent clustering results
 
-write.table(par.clu.lg,"./data/clustering/par_clu_long2.txt")
+write.table(par.clu.lg,"./data/clustering/par_clu_long.txt")
 
 
 ################################################################################
@@ -1337,7 +1321,7 @@ library(mppR)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -1359,52 +1343,52 @@ cluster <- makeCluster(6)
 
 
 for(i in 1:36){
-  
+
   par.exc <- as.character(unlist(part.perm[i, ]))
-  
+
   file.name <- paste0("./data/mpp_data/data_", par.exc[1], "_",
                       par.exc[5], ".rds")
-  
+
   # load the mppData object
-  
+
   data <- readRDS(file = file.name)
-  
+
   # put the right trait
-  
+
   pheno <- read.csv("./data/pheno/Adj_means.csv", row.names = 1)
   pheno.red <- pheno[rownames(pheno) %in% data$geno.id, par.exc[3], drop = FALSE]
-  
+
   trait <- data.frame(rownames(pheno.red), pheno.red[, 1],
                       stringsAsFactors = FALSE)
-  
+
   data <- mppData_chgPheno(trait = trait, mppData = data)
-  
+
   # load the par.clu object
-  
+
   if(par.exc[2] == "anc"){
-    
-    file.name <- paste0("./data/clustering/par_clu_", par.exc[1],"2.txt")
-    
+
+    file.name <- paste0("./data/clustering/par_clu_", par.exc[1],".txt")
+
     par.clu <- as.matrix(read.table(file.name))
-    
+
   }
-  
+
   # compute the permutation test
-  
+
   print(par.exc[1:4])
-  
+
   perm.thre <- mpp_perm(mppData = data, Q.eff = par.exc[2], VCOV = par.exc[4],
                         N = N, q.val = q.val, parallel = TRUE,
                         par.clu = par.clu, cluster = cluster)
-  
-  
+
+
   # save the results
-  
+
   file.name <- paste0(paste(par.exc[1:4], collapse = "_"), ".txt")
-  folder <- paste0("./results2/Threshold_permutation/", file.name)
-  
+  folder <- paste0("./results/Threshold_permutation/", file.name)
+
   write.table(cbind(perm.thre$max.pval, perm.thre$seed), folder)
-  
+
 }
 
 
@@ -1429,7 +1413,7 @@ library(parallel)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -1443,24 +1427,24 @@ data.type <- rep(c("IBD", "IBD", "IBS"), times = 6, each = 2)
 
 part.QTL <- data.frame(subset, Q.eff, trait, VCOV, data.type)
 
-folder <- "./results2/Threshold_permutation/"
-res.loc <- "./results2/QTL_analyses"
+folder <- "./results/Threshold_permutation/"
+res.loc <- "./results/QTL_analyses"
 
 
 for(i in 1:36){
-  
+
   # extract the ith partition
   part <- as.character(unlist(part.QTL[i,]))
-  
+
   print(part[1:4])
-  
+
   # get the threshold value
-  
+
   max.val <- read.table(paste0(folder, paste0(paste(part[1:3], collapse = "_"),
                                               "_h.err.txt")))
-  
+
   thre <- quantile(max.val[, 1], 0.95)
-  
+
   data <- readRDS(file = paste0("./data/mpp_data/data_", part[1],"_",
                                 part[5],".rds"))
 
@@ -1479,7 +1463,7 @@ for(i in 1:36){
 
   if(part[2] == "anc"){
 
-    file.name <- paste0("./data/clustering/par_clu_", part[1], "2.txt")
+    file.name <- paste0("./data/clustering/par_clu_", part[1], ".txt")
     par.clu <- as.matrix(read.table(file.name))
 
   }
@@ -1505,7 +1489,7 @@ for(i in 1:36){
                    silence.print = TRUE, output.loc = res.loc)
 
   if(parallel==TRUE){stopCluster(cl = cluster)}
-  
+
 }
 
 
@@ -1529,7 +1513,7 @@ library(mppR)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -1551,62 +1535,62 @@ cluster <- makeCluster(6)
 
 
 for(i in 1:36){
-  
+
   par.exc <- as.character(unlist(part.perm[i, ]))
-  
+
   file.name <- paste0("./data/mpp_data/data_", par.exc[1], "_",
                       par.exc[5], "_red.rds")
-  
+
   # load the mppData object
-  
+
   data <- readRDS(file = file.name)
-  
+
   # put the right trait
-  
+
   pheno <- read.csv("./data/pheno/Adj_means.csv", row.names = 1)
   pheno.red <- pheno[rownames(pheno) %in% data$geno.id, par.exc[3], drop = FALSE]
-  
+
   trait <- data.frame(rownames(pheno.red), pheno.red[, 1],
                       stringsAsFactors = FALSE)
-  
+
   data <- mppData_chgPheno(trait = trait, mppData = data)
-  
+
   # load the par.clu object
-  
+
   if(par.exc[2] == "anc"){
-    
-    file.name <- paste0("./data/clustering/par_clu_", par.exc[1],"2.txt")
-    
+
+    file.name <- paste0("./data/clustering/par_clu_", par.exc[1],".txt")
+
     par.clu <- as.matrix(read.table(file.name))
     par.clu <- par.clu[data$map[, 1], ]
-    
+
   }
-  
+
   # compute the permutation test
-  
+
   print(par.exc[1:4])
-  
+
   perm.thre <- mpp_perm(mppData = data, Q.eff = par.exc[2], VCOV = par.exc[4],
                         N = N, q.val = q.val, parallel = TRUE,
                         par.clu = par.clu, cluster = cluster)
-  
-  
+
+
   # save the results
-  
+
   file.name <- paste0(paste(par.exc[1:4], collapse = "_"), ".txt")
-  folder <- paste0("./results2/Threshold_CV/", file.name)
-  
+  folder <- paste0("./results/Threshold_CV/", file.name)
+
   write.table(cbind(perm.thre$max.pval, perm.thre$seed), folder)
-  
+
 }
 
 ###############################################################################
 ########################## End threshold reduced subset #######################
 ###############################################################################
 
-################################
-# 11. Cross-validation process #
-################################
+#########################
+# 11. Cross-validation  #
+#########################
 
 library(mppR)
 library(asreml)
@@ -1615,7 +1599,7 @@ library(asreml)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -1629,8 +1613,8 @@ data.type <- rep(c("IBD", "IBD", "IBS"), times = 6, each = 2)
 
 part.QTL <- data.frame(subset, Q.eff, trait, VCOV, data.type)
 
-folder <- "./results2/Threshold_CV/"
-res.loc <- "./results2/CV"
+folder <- "./results/Threshold_CV/"
+res.loc <- "./results/CV"
 
 library(parallel)
 parallel <-  TRUE
@@ -1650,64 +1634,64 @@ colnames(heritability) <- c("DMY", "PH")
 
 
 for(i in 1:36){
-  
+
   # extract the ith partition
   part <- as.character(unlist(part.QTL[i,]))
-  
+
   print(i)
   print(part[1:4])
-  
+
   # get the threshold value
-  
+
   max.val <- read.table(paste0(folder, paste0(part[1:4], collapse = "_"), ".txt"))
-  
+
   thre <- quantile(max.val[, 1], 0.95)
-  
+
   data <- readRDS(file = paste0("./data/mpp_data/data_", part[1],"_",
                                 part[5],"_red.rds"))
-  
+
   # put the right trait
-  
+
   pheno <- read.csv("./data/pheno/Adj_means.csv", row.names = 1)
   pheno.red <- pheno[rownames(pheno) %in% data$geno.id, part[3], drop = FALSE]
-  
+
   trait <- data.frame(rownames(pheno.red), pheno.red[, 1],
                       stringsAsFactors = FALSE)
-  
+
   data <- mppData_chgPheno(trait = trait, mppData = data)
-  
+
   her <- heritability[unique(data$cross.ind), part[3]]
-  
-  
+
+
   # load the par.clu object
-  
+
   if(part[2] == "anc"){
-    
-    file.name <- paste0("./data/clustering/par_clu_", part[1],"2.txt")
-    
+
+    file.name <- paste0("./data/clustering/par_clu_", part[1],".txt")
+
     par.clu <- as.matrix(read.table(file.name))
     par.clu <- par.clu[data$map[, 1], ]
-    
-    
+
+
   } else {par.clu <- NULL}
-  
-  
+
+
   CV <- mpp_CV(pop.name = part[1], trait.name = part[3],
                mppData = data, her = her, Rep = 20, k = 5, Q.eff = part[2],
                par.clu = par.clu, VCOV = part[4], thre.cof = thre, N.cim = 2,
                thre.QTL = thre, alpha.bk = 0.01, parallel = TRUE,
                cluster = cluster, silence.print = TRUE,
                output.loc = res.loc)
-  
+
 }
 
 ###############################################################################
 ################################ End CV procedure #############################
 ###############################################################################
 
-##############################
-# 13. Multi QTL effect model #
-##############################
+###########################################
+# 13. Multi QTL effect model full dataset #
+###########################################
 
 library(mppR)
 library(nlme)
@@ -1717,7 +1701,7 @@ library(asreml)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -1728,73 +1712,73 @@ part.MQE <- expand.grid(c("short", "hetero", "long"), c("DMY", "PH"),
                         c("h.err", "cr.err"), stringsAsFactors = FALSE)
 
 
-folder <- "./results2/Threshold_permutation/"
-res.loc <- "./results2/MQE"
+folder <- "./results/Threshold_permutation/"
+res.loc <- "./results/MQE"
 
 library(parallel)
 cluster <- makeCluster(6)
 
 
 for (i in 1:dim(part.MQE)[1]){
-  
+
   part <- as.character(unlist(part.MQE[i,]))
-  
+
   print(part)
-  
+
   # get the threshold value
-  
+
   # we do the average of the three type of QTL incidence matrices
-  
+
   max.val.par <- read.table(paste0(folder, paste0(part[1],"_","par","_",
                                                   part[2],"_","h.err.txt")))
-  
+
   max.val.anc <- read.table(paste0(folder, paste0(part[1],"_","anc","_",
                                                   part[2],"_","h.err.txt")))
-  
+
   max.val.biall <- read.table(paste0(folder, paste0(part[1],"_","biall","_",
                                                     part[2],"_","h.err.txt")))
-  
+
   thre1 <- quantile(max.val.par[, 1],0.95)
   thre2 <- quantile(max.val.anc[, 1],0.95)
   thre3 <- quantile(max.val.biall[, 1],0.95)
-  
+
   # take the average value of the three subsets thresholds
-  
+
   thre <- mean(c(thre1, thre2, thre3))
-  
+
   data <- readRDS(file = paste0("./data/mpp_data/data_", part[1],
                                 "_IBD.rds"))
-  
+
   data.bi <- readRDS(file = paste0("./data/mpp_data/data_", part[1],
                                    "_IBS.rds"))
-  
+
   # put the right trait
-  
+
   pheno <- read.csv("./data/pheno/Adj_means.csv", row.names = 1)
   pheno.red <- pheno[rownames(pheno) %in% data$geno.id, part[2], drop = FALSE]
-  
+
   trait <- data.frame(rownames(pheno.red), pheno.red[, 1],
                       stringsAsFactors = FALSE)
-  
+
   data <- mppData_chgPheno(trait = trait, mppData = data)
   data.bi <- mppData_chgPheno(trait = trait, mppData = data.bi)
-  
-  
+
+
   # par.clu object
-  
-  par.clu <- read.table(paste0("./data/clustering/par_clu_", part[1],"2.txt"))
+
+  par.clu <- read.table(paste0("./data/clustering/par_clu_", part[1],".txt"))
   par.clu <- as.matrix(par.clu)
-  
+
   Q.eff <- c("par","anc","biall")
-  
+
   if(part[3] == "h.err") parallel <- TRUE else parallel <- FALSE
-  
-  
+
+
   MQE <- MQE_proc(pop.name = part[1], trait.name = part[2], mppData = data,
                   mppData_bi = data.bi, Q.eff = Q.eff, par.clu = par.clu,
                   VCOV = part[3], threshold = thre, parallel = parallel,
                   cluster = cluster, output.loc = res.loc)
-  
+
 }
 
 
@@ -1815,7 +1799,7 @@ library(asreml)
 
 # SPECIFY YOUR PATH HERE (the location of ~/MPP_EUNAM)
 
-path <- "F:/EU_NAM/EU_NAM_DENT/MPP_EUNAM/"
+path <- "~/MPP_EUNAM/"
 
 setwd(path)
 
@@ -1826,8 +1810,8 @@ part.MQE <- expand.grid(c("short", "hetero", "long"), c("DMY", "PH"),
                         c("h.err", "cr.err_fast"), stringsAsFactors = FALSE)
 
 
-folder <- "./results2/Threshold_CV/"
-res.loc <- "./results2/MQE_CV"
+folder <- "./results/Threshold_CV/"
+res.loc <- "./results/MQE_CV"
 
 library(parallel)
 cluster <- makeCluster(6)
@@ -1846,65 +1830,65 @@ colnames(heritability) <- c("DMY", "PH")
 
 
 for (i in 1:dim(part.MQE)[1]){
-  
+
   part <- as.character(unlist(part.MQE[i,]))
-  
+
   print(part)
-  
+
   # get the threshold value
-  
+
   # we do the average of the three type of QTL incidence matrices
-  
+
   max.val.par <- read.table(paste0(folder, paste0(part[1],"_","par","_",
                                                   part[2],"_", part[3],".txt")))
-  
+
   max.val.anc <- read.table(paste0(folder, paste0(part[1],"_","anc","_",
                                                   part[2],"_", part[3],".txt")))
-  
+
   max.val.biall <- read.table(paste0(folder, paste0(part[1],"_","biall","_",
                                                     part[2],"_",part[3],".txt")))
-  
+
   thre1 <- quantile(max.val.par[,1],0.95)
   thre2 <- quantile(max.val.anc[,1],0.95)
   thre3 <- quantile(max.val.biall[,1],0.95)
-  
+
   # take the average value of the three subsets thresholds
-  
+
   thre <- mean(c(thre1, thre2, thre3))
-  
+
   data <- readRDS(file = paste0("./data/mpp_data/data_", part[1],
                                 "_IBD_red.rds"))
-  
+
   data.bi <- readRDS(file = paste0("./data/mpp_data/data_", part[1],
                                    "_IBS_red.rds"))
-  
+
   # put the right trait
-  
+
   pheno <- read.csv("./data/pheno/Adj_means.csv", row.names = 1)
   pheno.red <- pheno[rownames(pheno) %in% data$geno.id, part[2], drop = FALSE]
-  
+
   trait <- data.frame(rownames(pheno.red), pheno.red[, 1],
                       stringsAsFactors = FALSE)
-  
+
   data <- mppData_chgPheno(trait = trait, mppData = data)
   data.bi <- mppData_chgPheno(trait = trait, mppData = data.bi)
-  
-  
+
+
   # par.clu object
-  
-  par.clu <- read.table(paste0("./data/clustering/par_clu_", part[1], "2.txt"))
+
+  par.clu <- read.table(paste0("./data/clustering/par_clu_", part[1], ".txt"))
   par.clu <- as.matrix(par.clu)
   par.clu <- par.clu[data$map[, 1], ]
-  
+
   Q.eff <- c("par","anc","biall")
-  
+
   her <- heritability[unique(data$cross.ind), part[2]]
-  
-  
+
+
   MQE <- MQE_CV(pop.name = part[1], trait.name = part[2], mppData = data,
                 mppData_bi = data.bi, her = her, Rep = 20, k = 5, Q.eff = Q.eff,
                 par.clu = par.clu, VCOV = part[3], threshold = thre,
                 parallel = TRUE, cluster = cluster, silence.print = TRUE,
                 output.loc = res.loc)
-  
+
 }

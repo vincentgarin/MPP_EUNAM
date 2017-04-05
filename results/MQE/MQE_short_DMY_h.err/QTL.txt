@@ -1,0 +1,4 @@
+mk.names	chr	pos.ind	pos.cM	QTL.eff
+PZE-106000112	6	1	0	par
+PZE-107066392	7	197	57.4	anc
+PZE-108023313	8	120	43.2	anc

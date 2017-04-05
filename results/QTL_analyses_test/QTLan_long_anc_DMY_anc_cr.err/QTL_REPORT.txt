@@ -1,0 +1,33 @@
+long_anc DMY anc cr.err
+***********************
+
+Number of QTL(s): 1
+
+Global R2: 6.48
+
+Global adjusted R2: 5.42
+
+
+
+QTL 1
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-101208550   1  139.6  4.235072
+
+
+QTL effect per cross or parent:
+
+          Effect  Std.Err     W-stat      p-value Sign Con.part Par.all
+F353   0.0000000 0.000000  0.0000000 1.0000000000        ref.c1      AA
+UH250  4.0931552 1.055613 15.0351120 0.0001055294  ***       c1      BB
+B73    4.0931552 1.055613 15.0351120 0.0001055294  ***       c1      BB
+Mo17  -0.9324744 1.339255  0.4847829 0.4862638216            c1      BB
+W117   3.5294300 2.171926  2.6407013 0.1041575594            c1      AA
+EC169 -3.0736216 1.203303  6.5245496 0.0106395488    *       c1      BB
+
+
+Partial adj. R2 (%): 5.42
+

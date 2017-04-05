@@ -1,0 +1,3 @@
+nb.QTL	10
+glb.R2	52.73
+glb.adj.R2	49.31

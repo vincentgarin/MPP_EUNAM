@@ -1,0 +1,2 @@
+mk.names	chr	pos.ind	pos.cM	log10pval
+PZE-101155376	1	88	95.4	4.27729266583171

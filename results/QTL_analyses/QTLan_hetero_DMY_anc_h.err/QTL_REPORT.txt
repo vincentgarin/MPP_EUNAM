@@ -1,0 +1,81 @@
+hetero DMY anc h.err
+********************
+
+Number of QTL(s): 3
+
+Global R2: 15.1
+
+Global adjusted R2: 13.15
+
+
+
+QTL 1
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-102065225   2     61  4.371488
+
+
+QTL effect per cross or parent:
+
+         Effect   Std.Err    t-test     p-value Sign Con.part Par.all
+F353   0.000000 0.0000000  0.000000 1.000000000        ref.c1      BB
+UH304 -3.245999 1.4019882 -2.315283 0.021178563    *       c1      BB
+D09   -1.595843 0.7814646 -2.042119 0.041893192    *       c1      AA
+D06   -1.595843 0.7814646 -2.042119 0.041893192    *       c1      AA
+W117   2.793390 1.2904161  2.164720 0.031088492    *       c1      AA
+B73   -3.775338 1.2637364 -2.987441 0.003012871   **       c1      AA
+
+
+Partial adj. R2 (%): 4.71
+
+
+
+QTL 2
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-108013757   8   31.6  4.389147
+
+
+QTL effect per cross or parent:
+
+         Effect   Std.Err   t-test    p-value Sign Con.part Par.all
+F353   0.000000 0.0000000  0.00000 1.00000000        ref.c1      AA
+UH304 -1.633660 0.6758231 -2.41729 0.01615000    *       c1    <NA>
+D09   -1.633660 0.6758231 -2.41729 0.01615000    *       c1      AA
+D06   -1.633660 0.6758231 -2.41729 0.01615000    *       c1      AA
+B73   -1.633660 0.6758231 -2.41729 0.01615000    *       c1      AA
+W117   2.401985 1.3610601  1.76479 0.07847622    .       c1      BB
+
+
+Partial adj. R2 (%): 2.02
+
+
+
+QTL 3
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-108060980   8   53.6  5.532676
+
+
+QTL effect per cross or parent:
+
+         Effect   Std.Err    t-test      p-value Sign Con.part Par.all
+F353   0.000000 0.0000000  0.000000 1.0000000000        ref.c1      BB
+UH304 -2.441347 0.7135419 -3.421448 0.0006969969  ***       c1    <NA>
+D09   -2.441347 0.7135419 -3.421448 0.0006969969  ***       c1      AA
+D06   -2.441347 0.7135419 -3.421448 0.0006969969  ***       c1      AA
+W117  -2.441347 0.7135419 -3.421448 0.0006969969  ***       c1      BB
+B73   -1.932849 1.3042634 -1.481947 0.1392593758            c1      AA
+
+
+Partial adj. R2 (%): 2.72
+

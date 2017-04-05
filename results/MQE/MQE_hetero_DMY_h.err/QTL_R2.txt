@@ -1,0 +1,4 @@
+mk.names	chr	pos.ind	pos.cM	QTL.eff	R2.diff	adj.R2.diff	R2.sg	adj.R2.sg
+PZE-101196917	1	820	131	biall	5.78	5.65	4.62	4.35
+PZE-103123615	3	439	85.3	biall	4.16	4	5.85	5.58
+PZE-108061059	8	215	53.5	par	9.65	8.56	10.23	8.95

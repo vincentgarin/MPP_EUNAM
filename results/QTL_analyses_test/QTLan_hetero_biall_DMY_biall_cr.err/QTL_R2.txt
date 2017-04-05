@@ -1,0 +1,3 @@
+mk.names	chr	pos.ind	pos.cM	log10pval	R2.diff	adj.R2.diff	R2.sg	adj.R2.sg
+PZE-103116584	3	60	78.9	5.14352681256633	4.7	4.47	6.09	5.82
+PZE-108044274	8	35	46.7	6.56601092623861	5.86	5.62	7.24	6.98

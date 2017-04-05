@@ -1,0 +1,5 @@
+mk.names	chr	pos.ind	pos.cM	QTL.eff
+PZE-101196917	1	820	131	biall
+PZE-103123615	3	439	85.3	biall
+PZE-108061059	8	215	53.5	par
+PZE-108120391	8	487	98.6	anc

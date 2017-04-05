@@ -1,0 +1,57 @@
+short_biall DMY biall cr.err
+****************************
+
+Number of QTL(s): 2
+
+Global R2: 12.11
+
+Global adjusted R2: 11.62
+
+
+
+QTL 1
+-----
+
+QTL position:
+
+    mk.names chr pos.cM log10pval
+ PZA00606.10   6      2   6.42813
+
+
+QTL effect per cross or parent:
+
+         Effect   Std.Err   W-stat      p-value Sign Par.all
+D06   -2.639732 0.5217198 22.72895 1.865361e-06  ***      BB
+D09   -2.639732 0.5217198 22.72895 1.865361e-06  ***      BB
+F252  -2.639732 0.5217198 22.72895 1.865361e-06  ***      BB
+F353   0.000000 0.0000000  0.00000 1.000000e+00           AA
+F618  -2.639732 0.5217198 22.72895 1.865361e-06  ***      BB
+UH304  0.000000 0.0000000  0.00000 1.000000e+00           AA
+
+
+Partial adj. R2 (%): 6
+
+
+
+QTL 2
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-108042918   8   46.2  6.663982
+
+
+QTL effect per cross or parent:
+
+         Effect  Std.Err   W-stat      p-value Sign Par.all
+D06   -2.702145 0.521558 26.84182 2.208065e-07  ***      BB
+D09   -2.702145 0.521558 26.84182 2.208065e-07  ***      BB
+F252  -2.702145 0.521558 26.84182 2.208065e-07  ***      BB
+F353   0.000000 0.000000  0.00000 1.000000e+00           AA
+F618  -2.702145 0.521558 26.84182 2.208065e-07  ***      BB
+UH304  0.000000 0.000000  0.00000 1.000000e+00           AA
+
+
+Partial adj. R2 (%): 6.23
+

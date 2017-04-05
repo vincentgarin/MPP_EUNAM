@@ -1,0 +1,177 @@
+hetero_anc PH anc h.err
+***********************
+
+Number of QTL(s): 7
+
+Global R2: 47.22
+
+Global adjusted R2: 43.4
+
+
+
+QTL 1
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-101130213   1   81.6  7.299643
+
+
+QTL effect per cross or parent:
+
+         Effect   Std.Err    t-test      p-value Sign Con.part Par.all
+F353   0.000000 0.0000000  0.000000 1.000000e+00        ref.c1      AA
+UH304  0.000000 0.0000000  0.000000 1.000000e+00        ref.c1      AA
+D09   -2.429438 0.5331836 -4.556476 7.318900e-06  ***       c1      BB
+D06   -2.429438 0.5331836 -4.556476 7.318900e-06  ***       c1      BB
+W117  -1.953997 0.9952236 -1.963374 5.043705e-02    .       c1      BB
+B73   -4.012189 0.9294559 -4.316707 2.093103e-05  ***       c1      BB
+
+
+Partial adj. R2 (%): 6.79
+
+
+
+QTL 2
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-101199598   1  131.3  10.17597
+
+
+QTL effect per cross or parent:
+
+         Effect   Std.Err    t-test      p-value Sign Con.part Par.all
+F353  0.0000000 0.0000000 0.0000000 1.000000e+00        ref.c1      BB
+UH304 5.2894245 0.9654630 5.4786404 8.483807e-08  ***       c1      AA
+D09   0.4689958 0.5494981 0.8534985 3.939983e-01            c1      AA
+D06   0.4689958 0.5494981 0.8534985 3.939983e-01            c1      AA
+W117  0.6224655 0.9559607 0.6511412 5.154057e-01            c1      AA
+B73   4.8170394 0.9082349 5.3037373 2.076135e-07  ***       c1      AA
+
+
+Partial adj. R2 (%): 9.32
+
+
+
+QTL 3
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-104140347   4  115.3  6.442649
+
+
+QTL effect per cross or parent:
+
+         Effect   Std.Err    t-test      p-value Sign Con.part Par.all
+F353   0.000000 0.0000000  0.000000 1.000000e+00        ref.c1      AA
+UH304  0.000000 0.0000000  0.000000 1.000000e+00        ref.c1      AA
+D09    0.000000 0.0000000  0.000000 1.000000e+00        ref.c1      AA
+D06    0.000000 0.0000000  0.000000 1.000000e+00        ref.c1      AA
+W117  -3.788825 0.9453013 -4.008061 7.563131e-05  ***       c1      BB
+B73   -2.444258 0.9056940 -2.698768 7.315656e-03   **       c1      AA
+
+
+Partial adj. R2 (%): 3.62
+
+
+
+QTL 4
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-107074582   7   68.1  4.735472
+
+
+QTL effect per cross or parent:
+
+         Effect   Std.Err    t-test     p-value Sign Con.part Par.all
+F353   0.000000 0.0000000  0.000000 1.000000000        ref.c1      BB
+UH304  1.266121 0.6507855  1.945527 0.052555267    .       c1      AA
+W117   1.266121 0.6507855  1.945527 0.052555267    .       c1      AA
+D09    2.219290 0.7382640  3.006093 0.002847938   **       c1      AA
+D06    1.305016 0.7513946  1.736792 0.083351494    .       c1      AA
+B73   -2.320340 0.8618565 -2.692258 0.007456821   **       c1      AA
+
+
+Partial adj. R2 (%): 3.17
+
+
+
+QTL 5
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-108017647   8     37  9.119925
+
+
+QTL effect per cross or parent:
+
+          Effect   Std.Err     t-test      p-value Sign Con.part Par.all
+F353   0.0000000 0.0000000  0.0000000 1.000000e+00        ref.c1      BB
+UH304 -0.3819236 1.0305356 -0.3706069 7.111667e-01            c1    <NA>
+D09   -2.5459014 0.4057287 -6.2748854 1.091874e-09  ***       c1      AA
+D06   -2.5459014 0.4057287 -6.2748854 1.091874e-09  ***       c1      AA
+W117  -2.5459014 0.4057287 -6.2748854 1.091874e-09  ***       c1      AA
+B73   -2.5459014 0.4057287 -6.2748854 1.091874e-09  ***       c1      AA
+
+
+Partial adj. R2 (%): 6.36
+
+
+
+QTL 6
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-109091272   9   70.4  7.397936
+
+
+QTL effect per cross or parent:
+
+          Effect   Std.Err     t-test      p-value Sign Con.part Par.all
+F353   0.0000000 0.0000000  0.0000000 1.000000e+00        ref.c1      BB
+UH304  0.0000000 0.0000000  0.0000000 1.000000e+00        ref.c1      BB
+D09    0.2277862 0.7400560  0.3077959 7.584307e-01            c1      BB
+D06   -3.2575528 0.7725502 -4.2166227 3.201615e-05  ***       c1      AA
+W117   0.6759957 1.9999312  0.3380095 7.355697e-01            c1      AA
+B73   -4.0392317 0.8683715 -4.6515020 4.765554e-06  ***       c1      AA
+
+
+Partial adj. R2 (%): 6.02
+
+
+
+QTL 7
+-----
+
+QTL position:
+
+      mk.names chr pos.cM log10pval
+ PZE-110008044  10   23.9  6.731107
+
+
+QTL effect per cross or parent:
+
+          Effect   Std.Err     t-test      p-value Sign Con.part Par.all
+F353   0.0000000 0.0000000  0.0000000 1.000000e+00        ref.c1      BB
+UH304 -2.4096435 0.9898878 -2.4342593 1.544896e-02    *       c1      AA
+D09    1.3031378 0.7668331  1.6993761 9.018504e-02    .       c1      AA
+D06    3.0111003 0.7792412  3.8641443 1.340707e-04  ***       c1      AA
+W117   3.9069328 0.9085600  4.3001373 2.246932e-05  ***       c1      BB
+B73    0.4928648 0.9103623  0.5413941 5.885991e-01            c1      AA
+
+
+Partial adj. R2 (%): 6.3
+
