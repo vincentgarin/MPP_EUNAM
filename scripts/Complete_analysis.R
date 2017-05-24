@@ -1,9 +1,12 @@
 ################################################################################
 ################################################################################
 #
-# The effect of genetic distance between parents in MPP QTL analysis
+# How do the type of QTL effect and the form of the residual term influence QTL
+# detection in multi-parent population? A case study in the maize EU-NAM
+# population
 #
-# Vincent Garin, Marcos Malosetti, Fred van Eeuwijk, 2016
+# Vincent Garin, Valentin Wimmer, Sofiane Mezmouk, Marcos Malosetti
+# Fred van Eeuwijk
 #
 ################################################################################
 ################################################################################

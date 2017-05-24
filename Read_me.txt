@@ -1,9 +1,12 @@
 ################################################################################
 ################################################################################
 #
-# The effect of genetic distance between parents in MPP QTL analysis
+# How do the type of QTL effect and the form of the residual term influence QTL
+# detection in multi-parent population? A case study in the maize EU-NAM
+# population
 #
-# Vincent Garin, Marcos Malosetti, Fred van Eeuwijk, 2016
+# Vincent Garin, Valentin Wimmer, Sofiane Mezmouk, Marcos Malosetti
+# Fred van Eeuwijk
 #
 ################################################################################
 ################################################################################
@@ -34,7 +37,15 @@ name: geno_array_EUNAM.csv
 *** Except these data all origninal and intermediate datasets necessary
 to run the full analyses are present in the folowing folders of the repository
 
+~MPP_EUNAM/data/clustering
+
 ~MPP_EUNAM/data/geno
+
+~MPP_EUNAM/data/map
+
+~MPP_EUNAM/data/mpp_data
+
+~MPP_EUNAM/data/pheno
 
 
 *** to run the analysis you will need a list of package mentioned in the script.
@@ -68,40 +79,40 @@ the original results of the study are already saved in the folder
 ~\MPP_EUNAM\results.
 
 
-1. Adjusted means computation (line 55-440)
+1. Adjusted means computation
 
 
-2. Map processing (line 442-537)
+2. Map processing
 
 
-3. Genotype matrix sorting (line 540-637)
+3. Genotype matrix sorting
 
 
-4. Determination of the three subsets (line 639-738)
+4. Determination of the three subsets
 
 
-5. short subset data processing (line 742-1115)
+5. short subset data processing
 
 
-6. hetero subset data processing (line 1493-1867)
+6. heterogeneous subset data processing
 
 
-7. Long subset data processing (line 1118-1490)
+7. Long subset data processing
 
 
-8. Significance threshold determination (line 1986-2117)
+8. Significance threshold determination full datasets
 
 
-9. QTL analysis full datasets (line 2121-2244)
+9. QTL analysis full datasets
 
 
-10. Significance threshold determination on reduced subset
+10. Significance threshold determination reduced datasets
 
 
-11. Cross-validation
+11. Cross-validation (reduced datasets)
 
 
 12. Multi QTL effect model full dataset
 
 
-13. Multi QTL effect model CV
+13. Multi QTL effect model CV (reduced datasets)
